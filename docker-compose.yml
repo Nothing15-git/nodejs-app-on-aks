@@ -1,0 +1,30 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: nodejs-demoapp-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nodejs-demoapp-app
+    depends_on:
+      - mongo
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      TODO_MONGO_CONNSTR: mongodb://mongo:27017
+      TODO_MONGO_DB: todoDb
+      ENTRA_APP_ID: ${ENTRA_APP_ID:-}
+      WEATHER_API_KEY: ${WEATHER_API_KEY:-}
+      APPLICATIONINSIGHTS_CONNECTION_STRING: ${APPLICATIONINSIGHTS_CONNECTION_STRING:-}
+    ports:
+      - "3000:3000"
+
+volumes:
+  mongo-data:
